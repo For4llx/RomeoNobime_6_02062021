@@ -20,7 +20,7 @@ exports.likeSauce =  (req, res, next) => {
         likes = data.usersLiked.length;
 
         Sauce.findByIdAndUpdate({ _id: req.params.id }, { $push: { usersLiked: req.body.userId }, $set: { likes } })
-          .then(() => res.status(200).json({ message: data}))
+          .then(() => res.status(200).json({ message: "J'aime"}))
           .catch(error => res.status(400).json({ error }));
       }
       else if(req.body.like == -1 && !userHasDisliked)
@@ -29,7 +29,7 @@ exports.likeSauce =  (req, res, next) => {
         dislikes = data.usersDisliked.length;
 
         Sauce.findByIdAndUpdate({ _id: req.params.id }, { $push: { usersDisliked: req.body.userId }, $set: { dislikes } })
-          .then(() => res.status(200).json({ message: data}))
+          .then(() => res.status(200).json({ message: "J'aime pas"}))
           .catch(error => res.status(400).json({ error }));
       }
       else if(req.body.like == 0 && userHasLiked)
@@ -39,7 +39,7 @@ exports.likeSauce =  (req, res, next) => {
         likes = data.usersLiked.length;
 
         Sauce.updateOne({ _id: req.params.id }, { $pull: { usersLiked: req.body.userId }, $set: { likes }})
-          .then(() => res.status(200).json({ message: data}))
+          .then(() => res.status(200).json({ message: "Je retire mes appréciations"}))
           .catch(error => res.status(400).json({ error }));
       }
       else if(req.body.like == 0 && userHasDisliked)
@@ -49,8 +49,8 @@ exports.likeSauce =  (req, res, next) => {
         dislikes = data.usersDisliked.length;
 
         Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: req.body.userId }, $set: { dislikes }})
-          .then(() => res.status(200).json({ message: data}))
-          .catch(error => res.status(400).json({ error: data }));
+          .then(() => res.status(200).json({ message: "Je retire mes appréciations"}))
+          .catch(error => res.status(400).json({ error }));
       }
       else
       {
