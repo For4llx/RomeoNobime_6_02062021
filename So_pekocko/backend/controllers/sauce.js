@@ -3,52 +3,66 @@ const fs = require('fs');
 const { findOne } = require('../models/Sauce');
 
 exports.likeSauce =  (req, res, next) => {
-  Sauce.findOne({ _id: req.params.id }).then
+  Sauce.findOne({ _id: req.params.id })
+  .then
   (
     function(data)
     {
       let index = "";
       let likes = data.usersLiked.length;
       let dislikes = data.usersDisliked.length;
+      let userHasLiked = data.usersLiked.includes(req.body.userId);
+      let userHasDisliked = data.usersDisliked.includes(req.body.userId);
 
-      if(req.body.like == 1 && !data.usersLiked.includes(req.body.userId))
+      if(req.body.like == 1 && !userHasLiked)
       {
         data.usersLiked.push(req.body.userId);
         likes = data.usersLiked.length;
 
-        Sauce.findByIdAndUpdate({ _id: req.params.id }, { $push: { usersLiked: req.body.userId }, $set: { likes: likes } })
+        Sauce.findByIdAndUpdate({ _id: req.params.id }, { $push: { usersLiked: req.body.userId }, $set: { likes } })
           .then(() => res.status(200).json({ message: data}))
           .catch(error => res.status(400).json({ error }));
       }
-      else if(req.body.like == -1 && !data.usersDisliked.includes(req.body.userId))
+      else if(req.body.like == -1 && !userHasDisliked)
       {
         data.usersDisliked.push(req.body.userId);
         dislikes = data.usersDisliked.length;
 
-        Sauce.findByIdAndUpdate({ _id: req.params.id }, { $push: { usersDisliked: req.body.userId }, $set: { dislikes: dislikes } })
+        Sauce.findByIdAndUpdate({ _id: req.params.id }, { $push: { usersDisliked: req.body.userId }, $set: { dislikes } })
           .then(() => res.status(200).json({ message: data}))
           .catch(error => res.status(400).json({ error }));
       }
-      else if(req.body.like == 0 && data.usersLiked.includes(req.body.userId))
+      else if(req.body.like == 0 && userHasLiked)
       {
         index = data.usersLiked.indexOf(req.body.userId);
         data.usersLiked.splice(index, 1);
         likes = data.usersLiked.length;
 
-        Sauce.updateOne({ _id: req.params.id }, { $pull: { usersLiked: req.body.userId }, $set: { likes: likes }})
+        Sauce.updateOne({ _id: req.params.id }, { $pull: { usersLiked: req.body.userId }, $set: { likes }})
           .then(() => res.status(200).json({ message: data}))
           .catch(error => res.status(400).json({ error }));
       }
-      else if(req.body.like == 0 && data.usersDisliked.includes(req.body.userId))
+      else if(req.body.like == 0 && userHasDisliked)
       {
         index = data.usersDisliked.indexOf(req.body.userId);
         data.usersDisliked.splice(index, 1);
         dislikes = data.usersDisliked.length;
 
-        Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: req.body.userId }, $set: { dislikes: dislikes }})
+        Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: req.body.userId }, $set: { dislikes }})
           .then(() => res.status(200).json({ message: data}))
           .catch(error => res.status(400).json({ error: data }));
       }
+      else
+      {
+        console.log("error");
+      }
+    }
+  )
+  .catch
+  (
+    function(error)
+    {
+      console.log(error);
     }
   )
 }
